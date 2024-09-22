@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration System</title>
+    <link rel="stylesheet" href="./output.css">
+</head>
+
+<body class="font-mono bg-gray-600 text-white">
+    <main>
+        <h1 class="text-2xl text-center p-4 bg-slate-800 text-white">Student Registration System</h1>
+        <div class="flex flex-row flex-wrap justify-center">
+            <form class="text-2xl p-24 inline-block" onsubmit="addName(event)">
+                <!-- basic input feilds for forms -->
+                <label for="text">Student name :</label><br>
+                <input type="text" class="rounded-lg m-2 bg-slate-800" required id="text"><br>
+                <label for="idd">Student ID :</label><br>
+                <input type="number" class="rounded-lg m-2 bg-slate-800" required id="idd"><br>
+                <label for="email">Email ID:</label><br>
+                <input type="email" class="rounded-lg m-2 bg-slate-800" required id="email"><br>
+                <label for="contact">Contact No:</label><br>
+                <input type="number" class="rounded-lg m-2 bg-slate-800" required id="contact"><br>
+                <label for="class">Class:</label><br>
+                <input type="text" class="rounded-lg m-2 bg-slate-800" required id="class"><br>
+                <label for="rno">Roll No:</label><br>
+                <input type="number" required class="rounded-lg m-2 bg-slate-800" id="rno"><br>
+                <input type="submit" value="Add" id="submit-btn" class="border p-2 rounded-2xl w-24 m-2">
+            </form>
+
+            <!-- for siplaying the student records -->
+            <div class="p-36 w-full max-h-64 overflow-y-auto scroll-smooth scroll-snap-y" id="display">
+                <div class="flex border-b p-2 gap-8 ">
+                    <div class="w-1/6">Name</div>
+                    <div class="w-1/6">ID</div>
+                    <div class="w-1/6">Email</div>
+                    <div class="w-1/6">Contact</div>
+                    <div class="w-1/6">Class</div>
+                    <div class="w-1/6">Roll No</div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+    <script>
+        function addName(event) {
+            event.preventDefault();
+            const name = document.querySelector('#text').value;
+            const id = document.querySelector('#idd').value;
+            const email = document.querySelector('#email').value;
+            const contact = document.querySelector('#contact').value;
+            const Class = document.querySelector('#class').value;
+            const rno = document.querySelector('#rno').value;
+
+            const student = { name, id, email, contact, class: Class, rno };
+            localStorage.setItem(id, JSON.stringify(student));//stringfy method is used because local storage only take string 
+
+            document.querySelector('#text').value = '';
+            document.querySelector('#idd').value = '';
+            document.querySelector('#email').value = '';
+            document.querySelector('#contact').value = '';
+            document.querySelector('#class').value = '';
+            document.querySelector('#rno').value = '';
+            document.querySelector('#idd').removeAttribute('readonly');
+            document.querySelector("#submit-btn").value = "Add";
+            displayStudents();
+        }
+
+        function displayStudents() {
+            const result = document.querySelector("#display");
+            result.innerHTML = `
+                <div class="flex border-b p-2 gap-8">
+                    <div class="w-1/6">Name</div>
+                    <div class="w-1/6">ID</div>
+                    <div class="w-1/6">Email</div>
+                    <div class="w-1/6">Contact</div>
+                    <div class="w-1/6">Class</div>
+                    <div class="w-1/6">Roll No</div>
+                </div>`;
+
+            //retriving all the keys from local storage
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const student = JSON.parse(localStorage.getItem(key));
+
+                const studentDiv = document.createElement("div");
+                studentDiv.classList.add("flex", "items-center", "p-2", "border-b", "gap-8");
+                studentDiv.innerHTML = `
+                    <div class="w-1/6">${student.name}</div>
+                    <div class="w-1/6">${student.id}</div>
+                    <div class="w-1/6">${student.email}</div>
+                    <div class="w-1/6">${student.contact}</div>
+                    <div class="w-1/6">${student.class}</div>
+                    <div class="w-1/6">${student.rno}</div>`;
+
+                const delbtn = document.createElement('button');
+                const editbtn = document.createElement('button');
+                delbtn.textContent = "Delete";
+                delbtn.classList.add("border", "rounded-lg", "p-2", "ml-4", "bg-red-500", "text-white", "scroll-snap-start");
+                editbtn.textContent = "Edit";
+                editbtn.classList.add("border", "rounded-lg", "p-2", "ml-4", "bg-blue-500", "text-white", "scroll-snap-start");
+
+                delbtn.onclick = function () { //delete btn function
+                    localStorage.removeItem(key);
+                    displayStudents();
+                };
+                editbtn.onclick = function () { //edit btn function
+                    editStudent(key);
+                };
+
+                studentDiv.appendChild(editbtn);
+                studentDiv.appendChild(delbtn);
+                result.appendChild(studentDiv);
+            }
+        }
+
+        function editStudent(key) {
+            const student = JSON.parse(localStorage.getItem(key));
+            document.querySelector('#text').value = student.name;
+            document.querySelector('#idd').value = student.id;
+            document.querySelector('#idd').setAttribute("readonly", true); //setting the primary key to read only beacuse local storage main key is this only
+            document.querySelector('#email').value = student.email;
+            document.querySelector('#contact').value = student.contact;
+            document.querySelector('#class').value = student.class;
+            document.querySelector('#rno').value = student.rno;
+            document.querySelector("#submit-btn").value = "Update";
+        }
+
+        displayStudents();
+    </script>
+</body>
+
+</html>
